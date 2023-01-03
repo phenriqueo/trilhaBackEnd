@@ -9,12 +9,11 @@ public class DimensionFormMapper implements Mapper<DimensionForm, Dimension>{
     @Override
     public Dimension map(DimensionForm dimensionForm) {
         return Dimension.builder()
+                .id(dimensionForm.getId())
                 .name(dimensionForm.getName())
                 .dataType(dimensionForm.getDataType())
                 .build();
     }
 }
-
-
 
 

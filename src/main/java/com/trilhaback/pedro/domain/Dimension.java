@@ -16,9 +16,7 @@ public class Dimension {
     private Long id;
     private String name;
     private DataType datatype;
-    //rivate Long sonId;
-    //private List<Dimension> parentDimensions = new ArrayList<>();
-    //private List<DimensionContent> content = new ArrayList<>();
+
     public static Builder builder() {
         return new Builder();
     }

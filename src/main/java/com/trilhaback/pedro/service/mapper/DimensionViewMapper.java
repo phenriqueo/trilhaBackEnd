@@ -12,6 +12,7 @@ public class DimensionViewMapper implements Mapper<Dimension, DimensionView >{
         return DimensionView.builder()
                 .id(dimension.getId())
                 .name(dimension.getName())
+                .dataType(dimension.getDatatype())
                 .build();
     }
 }
