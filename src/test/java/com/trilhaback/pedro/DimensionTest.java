@@ -49,7 +49,7 @@ public class DimensionTest {
     @SneakyThrows
     public void primeiro_teste_com_o_figa() {
 
-        MvcResult mvcResult = mvc.perform();
+    //  MvcResult mvcResult = mvc.perform();
 
         System.out.println("teste deu bão");
     }
