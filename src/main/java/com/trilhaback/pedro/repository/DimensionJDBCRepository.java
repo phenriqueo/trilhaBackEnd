@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -24,10 +26,14 @@ public class DimensionJDBCRepository implements DimensionRepository {
             )
             """;
     private static final String UPDATE_DIMENSION = "UPDATE dimension SET name = ?, data_type = ?  WHERE id = ?";
-    private static final String FINDBYID ="SELECT id, name, data_type FROM dimension WHERE id = ?";
-//    private final JdbcTemplate jdbcTemplate;
+    private static final String FINDBYID = "SELECT id, name, data_type FROM dimension WHERE id = ?";
+    private static final String FINDBYNAME = "SELECT id, name, data_type FROM dimension WHERE name = ?";
+    private static final String DELETEBYID = "DELETE FROM dimension WHERE id = ?";
+    private static final String DROP_DIMENSION_TABLE = "DROP TABLE DIM_{0,number,#}";
+    //    private final JdbcTemplate jdbcTemplate;
     private Connection connection;
-//    public DimensionJDBCRepository(JdbcTemplate jdbcTemplate) {
+
+    //    public DimensionJDBCRepository(JdbcTemplate jdbcTemplate) {
 //        this.jdbcTemplate = jdbcTemplate;
 //    }
     public DimensionJDBCRepository(Connection connection) {
@@ -63,7 +69,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
             pstm.setString(2, dimension.getDatatype().toString());
             pstm.setLong(3, dimension.getId());
             pstm.execute();
-            try (ResultSet rs = pstm.getGeneratedKeys()){
+            try (ResultSet rs = pstm.getGeneratedKeys()) {
                 while (rs.next()) {
                     String name = rs.getString("name");
                     DataType dataType = DataType.valueOf(rs.getString("data_type"));
@@ -81,34 +87,84 @@ public class DimensionJDBCRepository implements DimensionRepository {
     public Dimension findById(Long id) {
         Dimension dimension = null;
         try (PreparedStatement pstm = connection.prepareStatement(FINDBYID, Statement.RETURN_GENERATED_KEYS)) {
-                pstm.setLong(1, id);
-                pstm.execute();
-                try (ResultSet rs = pstm.getResultSet()) {
-                    while ( rs.next()) {
-                        dimension = dimension.builder()
-                                .id(rs.getLong("id"))
-                                .name(rs.getString("name"))
-                                .dataType(DataType.valueOf(rs.getString("data_type")))
-                                .build();
-                    }
+            pstm.setLong(1, id);
+            pstm.execute();
+            try (ResultSet rs = pstm.getResultSet()) {
+                while (rs.next()) {
+                    dimension = dimension.builder()
+                            .id(rs.getLong("id"))
+                            .name(rs.getString("name"))
+                            .dataType(DataType.valueOf(rs.getString("data_type")))
+                            .build();
                 }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return dimension;
     }
-        @Override
+
+    @Override
     public int deleteById(Long id) {
-        return 0;
+        int rowNum;
+        try (PreparedStatement pstm = connection.prepareStatement(DELETEBYID)) {
+            pstm.setLong(1, id);
+            rowNum = pstm.executeUpdate();;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rowNum;
+    }
+
+    public void dropTable(Long id) {
+        String dropTable = MessageFormat.format(DROP_DIMENSION_TABLE, id);
+        try (PreparedStatement pstm = connection.prepareStatement(dropTable)) {
+            pstm.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Dimension findByName(String name) {
-        return null;
+        Dimension dimension = null;
+        try (PreparedStatement pstm = connection.prepareStatement(FINDBYNAME, Statement.RETURN_GENERATED_KEYS)) {
+            pstm.setString(1, name);
+            pstm.execute();
+            try (ResultSet rs = pstm.getResultSet()) {
+                while (rs.next()) {
+                    dimension = dimension.builder()
+                            .id(rs.getLong("id"))
+                            .name(rs.getString("name"))
+                            .dataType(DataType.valueOf(rs.getString("data_type")))
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return dimension;
     }
 
     @Override
     public List<Dimension> findAll() {
-        return null;
+        List<Dimension> dimensionList = new ArrayList<>();
+        try(PreparedStatement pstm = connection.prepareStatement("SELECT name, id, data_type FROM DIMENSION")) {
+            pstm.execute();
+            try (ResultSet rs = pstm.getResultSet()) {
+                while (rs.next()) {
+                    dimensionList.add(Dimension.builder()
+                            .id(rs.getLong("id"))
+                            .name(rs.getString("name"))
+                            .dataType(DataType.valueOf(rs.getString("data_type")))
+                            .build());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return dimensionList;
     }
 }

@@ -16,18 +16,14 @@ public class Dimension {
     private Long id;
     private String name;
     private DataType datatype;
-
+    private Long sonId;
+    private List<Dimension> parentListDimension = new ArrayList<>();
     public static Builder builder() {
         return new Builder();
     }
     public Dimension(String name, DataType dataType){
         this.name = name;
         this.datatype = dataType;
-    }
-
-    @Override
-    public String toString() {
-        return this.id + " " + this.name;
     }
 
     public static class Builder {

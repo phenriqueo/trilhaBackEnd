@@ -47,5 +47,22 @@ public class DimensionController {
         );
     }
 
+    @GetMapping
+    public ResponseEntity<List<DimensionView>> findAll() {
+        return new ResponseEntity<>(
+                dimensionService.findAll(),
+                HttpStatus.OK
+        );
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteById(@PathVariable Long id){
+        dimensionService.deleteById(id);
+        return new ResponseEntity<>(
+                HttpStatus.NO_CONTENT
+        );
+    }
+
 
 }

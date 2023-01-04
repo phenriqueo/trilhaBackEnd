@@ -12,6 +12,9 @@ import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequestScope
@@ -35,15 +38,35 @@ public class DimensionService {
     }
 
     public DimensionView update(DimensionForm dimensionForm) {
-        Dimension dimensionCheck = dimensionJDBCRepository.findById(dimensionForm.getId());
-        if (dimensionCheck == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dimension " + dimensionForm.getId() + " not found");
+        this.findById(dimensionForm.getId());
         Dimension dimension = dimensionJDBCRepository.update(dimensionFormMapper.map(dimensionForm));
         return dimensionViewMapper.map(dimension);
     }
 
     public DimensionView findById(Long id) {
         Dimension dimension = dimensionJDBCRepository.findById(id);
-        if (dimension == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dimension " + id + " not found");
+        if (dimension == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dimension " + id + " not found");
         return dimensionViewMapper.map(dimension);
     }
+
+    public DimensionView findByName(String name) {
+        Dimension dimension = dimensionJDBCRepository.findByName(name);
+        if (dimension == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dimension " + name + " not found");
+        return dimensionViewMapper.map(dimension);
+    }
+
+    public void deleteById(Long id) {
+        this.findById(id);
+        dimensionJDBCRepository.deleteById(id);
+        dimensionJDBCRepository.dropTable(id);
+    }
+
+    public List<DimensionView> findAll() {
+        return dimensionJDBCRepository.findAll().stream()
+                .map(dimension -> dimensionViewMapper.map(dimension)).collect(Collectors.toList());
+    }
+
+
 }
