@@ -1,7 +1,5 @@
 package com.trilhaback.pedro.controller;
 
-import com.trilhaback.pedro.domain.Dimension;
-import com.trilhaback.pedro.domain.Repository;
 import com.trilhaback.pedro.service.DimensionService;
 import com.trilhaback.pedro.service.dto.form.DimensionForm;
 import com.trilhaback.pedro.service.dto.view.DimensionView;
@@ -11,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -64,5 +61,12 @@ public class DimensionController {
         );
     }
 
-
+    @PutMapping(value = "/addparent")
+    @Transactional
+    public ResponseEntity<?> addDimensionSon(@RequestBody DimensionForm dimensionForm) {
+        dimensionService.addDimensionSon(dimensionForm);
+        return new ResponseEntity<>(
+                HttpStatus.OK
+        );
+    }
 }

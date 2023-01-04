@@ -68,5 +68,10 @@ public class DimensionService {
                 .map(dimension -> dimensionViewMapper.map(dimension)).collect(Collectors.toList());
     }
 
+    public void addDimensionSon(DimensionForm dimensionForm) {
+        this.findById(dimensionForm.getId());
+        dimensionJDBCRepository.addDimensionSon(dimensionFormMapper.map(dimensionForm));
+    }
+
 
 }

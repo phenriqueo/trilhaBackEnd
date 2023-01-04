@@ -30,6 +30,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
     private static final String FINDBYNAME = "SELECT id, name, data_type FROM dimension WHERE name = ?";
     private static final String DELETEBYID = "DELETE FROM dimension WHERE id = ?";
     private static final String DROP_DIMENSION_TABLE = "DROP TABLE DIM_{0,number,#}";
+    private static final String ADD_DIMENSION_PARENT = "UPDATE dimension SET sonid = ? WHERE id = ?";
     //    private final JdbcTemplate jdbcTemplate;
     private Connection connection;
 
@@ -166,5 +167,18 @@ public class DimensionJDBCRepository implements DimensionRepository {
             throw new RuntimeException(e);
         }
         return dimensionList;
+    }
+
+    public void addDimensionSon(Dimension dimension) {
+        try(PreparedStatement pstm = connection.prepareStatement(ADD_DIMENSION_PARENT)){
+            pstm.setLong(1, dimension.getSonId());
+            pstm.setLong(2, dimension.getId());
+            pstm.execute();
+//            ResultSet rs = pstm.getResultSet();
+//            rs.next();
+//            dimension.setSonId(rs.getLong("sonid"));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

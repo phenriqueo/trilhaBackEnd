@@ -16,8 +16,8 @@ public class Dimension {
     private Long id;
     private String name;
     private DataType datatype;
-    private Long sonId;
-    private List<Dimension> parentListDimension = new ArrayList<>();
+    private Long sonId = null;
+    private List<Dimension> parent = new ArrayList<>();
     public static Builder builder() {
         return new Builder();
     }
@@ -30,6 +30,7 @@ public class Dimension {
             private Long id;
             private String name;
             private DataType datatype;
+            private Long sonId;
 
         public Builder id(Long id) {
             this.id = id;
@@ -46,8 +47,14 @@ public class Dimension {
             return this;
         }
 
+        public Builder sonId(Long id) {
+            this.sonId = id;
+            return this;
+        }
+
         public Dimension build() {
             Dimension dimension = new Dimension(name, datatype);
+            dimension.sonId = this.sonId;
             dimension.id = this.id;
             return dimension;
         }

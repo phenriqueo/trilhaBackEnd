@@ -2,7 +2,10 @@ app:
   datasource:
     main:
       driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://localhost:5432/postgres
+      #URL para banco da aplicaçao
+      #jdbc-url: jdbc:postgresql://localhost:5432/postgres
+      #URL para banco de testes
+      jdbc-url: ${teste.datasource.url}
       password: 'postgres'
       pool-size: 30
       username: postgres

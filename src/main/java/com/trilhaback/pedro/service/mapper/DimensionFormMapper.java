@@ -12,6 +12,7 @@ public class DimensionFormMapper implements Mapper<DimensionForm, Dimension>{
                 .id(dimensionForm.getId())
                 .name(dimensionForm.getName())
                 .dataType(dimensionForm.getDataType())
+                .sonId(dimensionForm.getSonId())
                 .build();
     }
 }

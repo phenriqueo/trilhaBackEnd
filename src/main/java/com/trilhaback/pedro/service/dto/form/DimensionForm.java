@@ -14,4 +14,5 @@ public class DimensionForm {
     private Long id;
     private String name;
     private DataType dataType;
+    private Long sonId;
 }
