@@ -37,9 +37,11 @@ public class DimensionControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static Integer produtoDimensionID;
-    private static Integer cidadeDimensionID;
-    private static Integer marcaDimensionID;
+    private static Integer taskDimensionID;
+    private static Integer taskDeletadaDimensionID;
+    private static Integer projetoDimensionID;
+    private static Integer statusTaskDimensionID;
+    private static Integer tipoProjetoDimensionID;
 
     @Autowired
     private MockMvc mvc;
@@ -73,68 +75,68 @@ public class DimensionControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("cria dimensao produto")
+    @DisplayName("cria dimensao tarefa")
     @SneakyThrows
-    public void criaDimensaoProduto() {
-        DimensionForm dimensionForm = DimensionForm.builder().name("Produto").dataType(DataType.valueOf("INT")).build();
+    public void criaDimensaoTarefa() {
+        DimensionForm dimensionForm = DimensionForm.builder().name("Tarefa").dataType(DataType.valueOf("INT")).build();
         MvcResult mvcResult = mvc.perform(post("/dimension")
                         .content(objectMapper.writeValueAsString(dimensionForm))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Produto"))
+                .andExpect(jsonPath("$.name").value("Tarefa"))
                 .andDo(print())
                 .andReturn();
 
-        produtoDimensionID = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        taskDimensionID = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
     }
 
     @Test
     @Order(2)
-    @DisplayName("altera nome dimensao produto para produto alterado")
+    @DisplayName("altera nome dimensao tarefa para task")
     @SneakyThrows
-    public void alteraNomeDimensaoProduto() {
-        DimensionForm dimensionForm = DimensionForm.builder().name("Produto Alterado").dataType(DataType.valueOf("INT")).id(Long.valueOf(produtoDimensionID)).build();
+    public void alteraNomeDimensaoTask() {
+        DimensionForm dimensionForm = DimensionForm.builder().name("Task").dataType(DataType.valueOf("INT")).id(Long.valueOf(taskDimensionID)).build();
         MvcResult mvcResult = mvc.perform(post("/dimension/save")
                         .content(objectMapper.writeValueAsString(dimensionForm))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Produto Alterado"))
+                .andExpect(jsonPath("$.name").value("Task"))
                 .andDo(print())
                 .andReturn();
     }
 
     @Test
     @Order(3)
-    @DisplayName("busca produto por ID")
+    @DisplayName("busca dimensao task por ID")
     @SneakyThrows
-    public void buscaProdutoPorId() {
-        MvcResult mvcResult = mvc.perform(get("/dimension/" + produtoDimensionID)
+    public void buscaDimensaoTaskPorId() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/" + taskDimensionID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Produto Alterado"))
+                .andExpect(jsonPath("$.name").value("Task"))
                 .andDo(print())
                 .andReturn();
     }
 
     @Test
     @Order(4)
-    @DisplayName("cria dimensao cidade")
+    @DisplayName("cria dimensao task deletada")
     @SneakyThrows
-    public void criaDimensaoCidade() {
-        DimensionForm dimensionForm = DimensionForm.builder().name("Cidade").dataType(DataType.valueOf("VARCHAR")).build();
+    public void criaDimensaoTaskDeletada() {
+        DimensionForm dimensionForm = DimensionForm.builder().name("Task Deletada").dataType(DataType.valueOf("VARCHAR")).build();
         MvcResult mvcResult = mvc.perform(post("/dimension")
                         .content(objectMapper.writeValueAsString(dimensionForm))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Cidade"))
+                .andExpect(jsonPath("$.name").value("Task Deletada"))
                 .andDo(print())
                 .andReturn();
 
-        cidadeDimensionID = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        taskDeletadaDimensionID = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
     }
 
     @Test
@@ -146,17 +148,16 @@ public class DimensionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                //.andExpect(jsonPath("$.name").value("Produto Alterado"))
                 .andDo(print())
                 .andReturn();
     }
 
     @Test
     @Order(6)
-    @DisplayName("deleta dimensao cidade")
+    @DisplayName("deleta dimensao task deletada")
     @SneakyThrows
-    public void deletaDimensaoProduto() {
-        MvcResult mvcResult = mvc.perform(delete("/dimension/" + cidadeDimensionID)
+    public void deletaDimensaoTaskDeletada() {
+        MvcResult mvcResult = mvc.perform(delete("/dimension/" + taskDeletadaDimensionID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
@@ -166,10 +167,10 @@ public class DimensionControllerTest {
 
     @Test
     @Order(7)
-    @DisplayName("busca por dimensao cidade deletada")
+    @DisplayName("busca por dimensao task deletada")
     @SneakyThrows
-    public void buscaDimensaoCidadeDeletada() {
-        MvcResult mvcResult = mvc.perform(get("/dimension/" + cidadeDimensionID)
+    public void buscaDimensaoTaskDeletada() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/" + taskDeletadaDimensionID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -179,39 +180,145 @@ public class DimensionControllerTest {
 
     @Test
     @Order(8)
-    @DisplayName("cria dimensao marca")
+    @DisplayName("cria dimensao projeto")
     @SneakyThrows
-    public void criaDimensaoMarca() {
-        DimensionForm dimensionForm = DimensionForm.builder().name("Marca").dataType(DataType.valueOf("INT")).build();
+    public void criaDimensaoProjeto() {
+        DimensionForm dimensionForm = DimensionForm.builder().name("Projeto").dataType(DataType.valueOf("INT")).build();
         MvcResult mvcResult = mvc.perform(post("/dimension")
                         .content(objectMapper.writeValueAsString(dimensionForm))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Marca"))
+                .andExpect(jsonPath("$.name").value("Projeto"))
                 .andDo(print())
                 .andReturn();
 
-        marcaDimensionID = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        projetoDimensionID = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
     }
 
     @Test
     @Order(9)
-    @DisplayName("adiciona dimensao marca como pai de produto")
+    @DisplayName("adiciona dimensao projeto como pai de task")
     @SneakyThrows
-    public void adicionaDimensaoMarcaComoPaiDeProduto() {
+    public void adicionaDimensaoProjetoComoPaiDeTask() {
         DimensionForm dimensionForm = DimensionForm.builder()
-                .id(Long.valueOf(marcaDimensionID))
-                .name("Marca")
-                .dataType(DataType.valueOf("INT"))
-                .sonId(Long.valueOf(produtoDimensionID))
+                .id(Long.valueOf(projetoDimensionID))
+                .sonId(Long.valueOf(taskDimensionID))
                 .build();
         MvcResult mvcResult = mvc.perform(put("/dimension/addparent")
                         .content(objectMapper.writeValueAsString(dimensionForm))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                //.andExpect(jsonPath("$.sonID").value(produtoDimensionID))
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("busca por projeto com dimensao filha task")
+    @SneakyThrows
+    public void buscaPorProdjtoComDimensaoFilhaTask() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/" + projetoDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("adiciona dimensao status task e adiciona como pai de task")
+    @SneakyThrows
+    public void adicionaDimensaoStatusTaskEAdicionaComoPaiDeTask() {
+        DimensionForm dimensionFormStatusTask = DimensionForm.builder()
+                .name("Status Task")
+                .dataType(DataType.valueOf("INT"))
+                .build();
+
+        MvcResult mvcResultCriaDimensao = mvc.perform(post("/dimension")
+                        .content(objectMapper.writeValueAsString(dimensionFormStatusTask))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Status Task"))
+                .andDo(print())
+                .andReturn();
+
+        statusTaskDimensionID = JsonPath.read(mvcResultCriaDimensao.getResponse().getContentAsString(), "$.id");
+
+        DimensionForm dimensionFormAddParentTask = DimensionForm.builder()
+                .id(Long.valueOf(statusTaskDimensionID))
+                .sonId(Long.valueOf(taskDimensionID))
+                .build();
+
+        MvcResult mvcResultAssociaDimensao = mvc.perform(put("/dimension/addparent")
+                        .content(objectMapper.writeValueAsString(dimensionFormAddParentTask))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("adiciona dimensao tipo projeto e adiciona como pai de projeto")
+    @SneakyThrows
+    public void adicionaDimensaoTipoProjetoEAdicionaComoPaiDeProjeto() {
+        DimensionForm dimensionFormTipoProjeto = DimensionForm.builder()
+                .name("Tipo Projeto")
+                .dataType(DataType.valueOf("INT"))
+                .build();
+
+        MvcResult mvcResultCriaDimensao = mvc.perform(post("/dimension")
+                        .content(objectMapper.writeValueAsString(dimensionFormTipoProjeto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Tipo Projeto"))
+                .andDo(print())
+                .andReturn();
+
+        tipoProjetoDimensionID = JsonPath.read(mvcResultCriaDimensao.getResponse().getContentAsString(), "$.id");
+
+        DimensionForm dimensionFormAddParentProjeto = DimensionForm.builder()
+                .id(Long.valueOf(tipoProjetoDimensionID))
+                .sonId(Long.valueOf(projetoDimensionID))
+                .build();
+
+        MvcResult mvcResultAssociaDimensao = mvc.perform(put("/dimension/addparent")
+                        .content(objectMapper.writeValueAsString(dimensionFormAddParentProjeto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("busca por tipo projeto com dimensao filha projeto")
+    @SneakyThrows
+    public void buscaPorTipoProjetoComDimensaoFilhaProjeto() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/" + tipoProjetoDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("busca por arvore dimensao task")
+    @SneakyThrows
+    public void buscaPorArvoreDimensaoTask() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/tree/" + taskDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
     }

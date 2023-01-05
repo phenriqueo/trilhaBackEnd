@@ -69,4 +69,12 @@ public class DimensionController {
                 HttpStatus.OK
         );
     }
+
+    @GetMapping(value = "/tree/{id}")
+    public ResponseEntity<DimensionView> findTreeById(@PathVariable Long id){
+        return new ResponseEntity<>(
+                dimensionService.findTreeById(id),
+                HttpStatus.OK
+        );
+    }
 }

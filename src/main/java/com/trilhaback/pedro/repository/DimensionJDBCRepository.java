@@ -26,17 +26,19 @@ public class DimensionJDBCRepository implements DimensionRepository {
             )
             """;
     private static final String UPDATE_DIMENSION = "UPDATE dimension SET name = ?, data_type = ?  WHERE id = ?";
-    private static final String FINDBYID = "SELECT id, name, data_type FROM dimension WHERE id = ?";
-    private static final String FINDBYNAME = "SELECT id, name, data_type FROM dimension WHERE name = ?";
+    private static final String FINDBYID = "SELECT id, name, data_type, sonid FROM dimension WHERE id = ?";
+    private static final String FINDBYNAME = "SELECT id, name, data_type, sonid FROM dimension WHERE name = ?";
     private static final String DELETEBYID = "DELETE FROM dimension WHERE id = ?";
     private static final String DROP_DIMENSION_TABLE = "DROP TABLE DIM_{0,number,#}";
     private static final String ADD_DIMENSION_PARENT = "UPDATE dimension SET sonid = ? WHERE id = ?";
-    //    private final JdbcTemplate jdbcTemplate;
-    private Connection connection;
+    private static final String FINDTREEBYID = "SELECT id FROM dimension WHERE sonid = ?";
 
+    //    private final JdbcTemplate jdbcTemplate;
     //    public DimensionJDBCRepository(JdbcTemplate jdbcTemplate) {
 //        this.jdbcTemplate = jdbcTemplate;
 //    }
+    private Connection connection;
+
     public DimensionJDBCRepository(Connection connection) {
         this.connection = connection;
     }
@@ -96,6 +98,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
                             .id(rs.getLong("id"))
                             .name(rs.getString("name"))
                             .dataType(DataType.valueOf(rs.getString("data_type")))
+                            .sonId(rs.getLong("sonid"))
                             .build();
                 }
             }
@@ -110,7 +113,8 @@ public class DimensionJDBCRepository implements DimensionRepository {
         int rowNum;
         try (PreparedStatement pstm = connection.prepareStatement(DELETEBYID)) {
             pstm.setLong(1, id);
-            rowNum = pstm.executeUpdate();;
+            rowNum = pstm.executeUpdate();
+            ;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -138,6 +142,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
                             .id(rs.getLong("id"))
                             .name(rs.getString("name"))
                             .dataType(DataType.valueOf(rs.getString("data_type")))
+                            .sonId(rs.getLong("sonid"))
                             .build();
                 }
             }
@@ -150,7 +155,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
     @Override
     public List<Dimension> findAll() {
         List<Dimension> dimensionList = new ArrayList<>();
-        try(PreparedStatement pstm = connection.prepareStatement("SELECT name, id, data_type FROM DIMENSION")) {
+        try (PreparedStatement pstm = connection.prepareStatement("SELECT name, id, data_type, sonid FROM DIMENSION")) {
             pstm.execute();
             try (ResultSet rs = pstm.getResultSet()) {
                 while (rs.next()) {
@@ -158,6 +163,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
                             .id(rs.getLong("id"))
                             .name(rs.getString("name"))
                             .dataType(DataType.valueOf(rs.getString("data_type")))
+                            .sonId(rs.getLong("sonid"))
                             .build());
                 }
             } catch (SQLException e) {
@@ -170,15 +176,33 @@ public class DimensionJDBCRepository implements DimensionRepository {
     }
 
     public void addDimensionSon(Dimension dimension) {
-        try(PreparedStatement pstm = connection.prepareStatement(ADD_DIMENSION_PARENT)){
+        try (PreparedStatement pstm = connection.prepareStatement(ADD_DIMENSION_PARENT)) {
             pstm.setLong(1, dimension.getSonId());
             pstm.setLong(2, dimension.getId());
             pstm.execute();
-//            ResultSet rs = pstm.getResultSet();
-//            rs.next();
-//            dimension.setSonId(rs.getLong("sonid"));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Dimension findTreeById(Long id) {
+        Dimension dimension = findById(id);
+        dimension.setSonId(null);
+        dimension.setDatatype(null);
+        List<Dimension> parent = new ArrayList<>();
+        try (PreparedStatement pstm = connection.prepareStatement(FINDTREEBYID)) {
+            pstm.setLong(1, id);
+            pstm.execute();
+            try (ResultSet rs = pstm.getResultSet()) {
+                while (rs.next()) {
+                    parent.add(findTreeById(rs.getLong("id")));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        dimension.setParent(parent);
+        return dimension;
     }
 }

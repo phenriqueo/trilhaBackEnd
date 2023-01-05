@@ -73,5 +73,8 @@ public class DimensionService {
         dimensionJDBCRepository.addDimensionSon(dimensionFormMapper.map(dimensionForm));
     }
 
-
+    public DimensionView findTreeById(Long id) {
+        this.findById(id);
+        return dimensionViewMapper.map(dimensionJDBCRepository.findTreeById(id));
+    }
 }
