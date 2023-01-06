@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DimensionControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     private static Integer taskDimensionID;
     private static Integer taskDeletadaDimensionID;
     private static Integer projetoDimensionID;
@@ -223,6 +222,7 @@ public class DimensionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sonId").value(taskDimensionID))
                 .andDo(print())
                 .andReturn();
     }
@@ -306,6 +306,7 @@ public class DimensionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sonId").value(projetoDimensionID))
                 .andDo(print())
                 .andReturn();
     }
@@ -319,6 +320,36 @@ public class DimensionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.parent[0].id").value(projetoDimensionID))
+                .andExpect(jsonPath("$.parent[1].id").value(statusTaskDimensionID))
+                .andExpect(jsonPath("$.parent[0].parent[0].id").value(tipoProjetoDimensionID))
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("deleta relacao entre task e status task")
+    @SneakyThrows
+    public void deletaRelacaoEntreTaskEStatusTask() {
+        MvcResult mvcResult = mvc.perform(put("/dimension/removeSonId/" + statusTaskDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(16)
+    @DisplayName("busca por dimensao status task com campo sonid null")
+    @SneakyThrows
+    public void buscaPorDimensaoStatusTaskComCampoSonIdNull() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/" + statusTaskDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sonId").value(0))
                 .andDo(print())
                 .andReturn();
     }

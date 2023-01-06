@@ -10,13 +10,15 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 
 public class Dimension {
 
     private Long id;
     private String name;
     private DataType datatype;
-    private Long sonId = null;
+    private Long sonId;
     private List<Dimension> parent = new ArrayList<>();
     public static Builder builder() {
         return new Builder();
@@ -25,7 +27,6 @@ public class Dimension {
         this.name = name;
         this.datatype = dataType;
     }
-
     public static class Builder {
             private Long id;
             private String name;

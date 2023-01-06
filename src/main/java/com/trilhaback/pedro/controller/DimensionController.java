@@ -77,4 +77,12 @@ public class DimensionController {
                 HttpStatus.OK
         );
     }
+
+    @PutMapping(value = "/removeSonId/{id}")
+        public ResponseEntity<?> removeSonId(@PathVariable Long id){
+        dimensionService.removeSonId(id);
+        return new ResponseEntity<>(
+                    HttpStatus.OK
+            );
+        }
 }

@@ -19,9 +19,9 @@ public class DimensionView {
 
     private Long id;
     private String name;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    //@JsonInclude(JsonInclude.Include.NON_NULL)
     private DataType dataType;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    //@JsonInclude(JsonInclude.Include.NON_NULL)
     private Long sonId;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<DimensionView> parent;
