@@ -21,11 +21,20 @@ public class DimensionDDLRepository {
             """;
     private static final String DROP_DIMENSION_CONTENT_TABLE_DDL = "DROP TABLE DIM_{0,number,#} CASCADE";
 
-    private static final String ALTER_DIMENSION_TABLE_SONID = """
+    private static final String ALTER_DIMENSION_TABLE_ADD_SONID = """
             ALTER TABLE DIM_{0,number,#}
-            ADD COLUMN ID_{1,number,#} {2},
+            ADD COLUMN ID_{1,number,#} {2} DEFAULT -999,
             ADD CONSTRAINT ID_{1,number,#}
             FOREIGN KEY (ID_{1,number,#}) REFERENCES DIM_{1,number,#}(id)
+            """;
+
+    private static final String INSERT_NULL_LINE = """
+            INSERT INTO dim_{0,number,#}(id, name) VALUES(-999, ''Nulo'')
+            """;
+
+    private static final String ALTER_DIMENSION_TABLE_REMOVE_SONID = """
+            ALTER TABLE DIM_{0,number,#}
+            DROP COLUMN ID_{1,number,#}
             """;
 
     private Connection connection;
@@ -35,7 +44,7 @@ public class DimensionDDLRepository {
     }
 
     public void createDimensionContentTable(Dimension dimension) {
-        String createTableDimension = MessageFormat.format(CREATE_DIMENSION_CONTENT_TABLE_DDL, dimension.getId(), dimension.getDatatype());
+        String createTableDimension = MessageFormat.format(CREATE_DIMENSION_CONTENT_TABLE_DDL, dimension.getId(), dimension.getDataType());
         try (PreparedStatement pstm = connection.prepareStatement(createTableDimension)) {
             pstm.execute();
         } catch (SQLException e) {
@@ -54,8 +63,27 @@ public class DimensionDDLRepository {
 
     public void alterDimensionContentTableSonId(Dimension dimension) {
         String alterDimensionContentTableSonId = MessageFormat
-                .format(ALTER_DIMENSION_TABLE_SONID, dimension.getSonId(), dimension.getId(), dimension.getDatatype());
+                .format(ALTER_DIMENSION_TABLE_ADD_SONID, dimension.getSonId(), dimension.getId(), dimension.getDataType());
         try (PreparedStatement pstm = connection.prepareStatement(alterDimensionContentTableSonId)) {
+            pstm.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void insertNullLine(Dimension dimension) {
+        String insertNullLine = MessageFormat.format(INSERT_NULL_LINE, dimension.getId());
+        try (PreparedStatement pstm = connection.prepareStatement(insertNullLine)) {
+            pstm.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void dropParentDimensionColumn(Dimension dimension) {
+        String alterDimensionTableRemoveSonId = MessageFormat.
+                format(ALTER_DIMENSION_TABLE_REMOVE_SONID, dimension.getSonId(), dimension.getId());
+        try (PreparedStatement pstm = connection.prepareStatement(alterDimensionTableRemoveSonId)) {
             pstm.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

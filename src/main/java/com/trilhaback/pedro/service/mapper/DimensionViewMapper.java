@@ -14,7 +14,7 @@ public class DimensionViewMapper implements Mapper<Dimension, DimensionView >{
         return DimensionView.builder()
                 .id(dimension.getId())
                 .name(dimension.getName())
-                .dataType(dimension.getDatatype())
+                .dataType(dimension.getDataType())
                 .sonId(dimension.getSonId())
                 .parent(dimension.getParent().stream().map(dimension1 -> this.map(dimension1)).collect(Collectors.toList()))
                 .build();

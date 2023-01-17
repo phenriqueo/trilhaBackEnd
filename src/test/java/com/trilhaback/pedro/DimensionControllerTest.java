@@ -2,6 +2,9 @@ package com.trilhaback.pedro;
 
 import com.jayway.jsonpath.JsonPath;
 import com.trilhaback.pedro.domain.DataType;
+import com.trilhaback.pedro.domain.Dimension;
+import com.trilhaback.pedro.domain.NodeContent;
+import com.trilhaback.pedro.service.dto.form.DimensionContentForm;
 import com.trilhaback.pedro.service.dto.form.DimensionForm;
 import com.zaxxer.hikari.HikariConfig;
 import lombok.SneakyThrows;
@@ -20,6 +23,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.print.attribute.standard.Media;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -41,6 +46,10 @@ public class DimensionControllerTest {
     private static Integer projetoDimensionID;
     private static Integer statusTaskDimensionID;
     private static Integer tipoProjetoDimensionID;
+    private static Integer itemTaskID = 1;
+    private static Integer itemTaskID2 = 2;
+    private static Integer itemProjetoID = 1;
+    private static Integer itemTipoProjetoID = 1;
 
     @Autowired
     private MockMvc mvc;
@@ -332,7 +341,13 @@ public class DimensionControllerTest {
     @DisplayName("deleta relacao entre task e status task")
     @SneakyThrows
     public void deletaRelacaoEntreTaskEStatusTask() {
-        MvcResult mvcResult = mvc.perform(put("/dimension/removeSonId/" + statusTaskDimensionID)
+        DimensionForm dimensionFormStatusTask = DimensionForm.builder()
+                .id(Long.valueOf(statusTaskDimensionID))
+                .sonId(Long.valueOf(taskDimensionID))
+                .build();
+
+        MvcResult mvcResult = mvc.perform(put("/dimension/removeSonId/")
+                        .content(objectMapper.writeValueAsString(dimensionFormStatusTask))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -352,6 +367,174 @@ public class DimensionControllerTest {
                 .andExpect(jsonPath("$.sonId").value(0))
                 .andDo(print())
                 .andReturn();
+    }
+
+    @Test
+    @Order(20)
+    @DisplayName("inserir item task na dimensao task")
+    @SneakyThrows
+    public void inserirItemTsakNaDimensaoTask() {
+        DimensionContentForm dimensionContentForm = DimensionContentForm.builder()
+                .id(String.valueOf(itemTaskID))
+                .name("Criar arvore dimensoes")
+                .build();
+
+        MvcResult mvcResult = mvc.perform(post("/dimensionContent/" + taskDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentForm))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(21)
+    @DisplayName("alterar nome do 'Criar arvore dimensoes' para 'Alterar arvore dimensoes'")
+    @SneakyThrows
+    public void alterarNomeItemTask() {
+        DimensionContentForm dimensionContentForm = DimensionContentForm.builder()
+                .id(String.valueOf(itemTaskID))
+                .name("Alterar arvore dimensoes")
+                .build();
+
+        MvcResult mvcResult = mvc.perform(put("/dimensionContent/" + taskDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentForm))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(22)
+    @DisplayName("busca por conteudo dimensao")
+    @SneakyThrows
+    public void buscaPorConteudoDimensao() {
+        MvcResult mvcResult = mvc.perform(get("/dimensionContent/" + taskDimensionID + "/" + itemTaskID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Alterar arvore dimensoes"))
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(23)
+    @DisplayName("deleta conteudo dimensao")
+    @SneakyThrows
+    public void deletaConteudoDimensao() {
+        MvcResult mvcResult = mvc.perform(delete("/dimensionContent/" + taskDimensionID + "/" + itemTaskID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print())
+                .andReturn();
+
+        MvcResult mvcResult2 = mvc.perform(get("/dimensionContent/" + taskDimensionID + "/" + itemTaskID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(24)
+    @DisplayName("adiciona membro nas dimensoes task, projeto, tipo projeto e lista todos os itens da dimensao task")
+    @SneakyThrows
+    public void adicionaMembroNasDimensoesTaskProjetoTipoProjeto() {
+        DimensionContentForm dimensionContentFormTask = DimensionContentForm.builder()
+                .id(String.valueOf(itemTaskID))
+                .name("Criar arvore dimensoes")
+                .build();
+
+        DimensionContentForm dimensionContentFormTask2 = DimensionContentForm.builder()
+                .id(String.valueOf(itemTaskID2))
+                .name("Estudar sobre design patterns")
+                .build();
+
+        DimensionContentForm dimensionContentFormProjeto = DimensionContentForm.builder()
+                .id(String.valueOf(itemProjetoID))
+                .name("Trilha Back Jr")
+                .build();
+
+        DimensionContentForm dimensionContentFormTipoProjeto = DimensionContentForm.builder()
+                .id(String.valueOf(itemTipoProjetoID))
+                .name("Industria")
+                .build();
+
+        MvcResult mvcResult = mvc.perform(post("/dimensionContent/" + taskDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentFormTask))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andReturn();
+
+        MvcResult mvcResult2 = mvc.perform(post("/dimensionContent/" + taskDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentFormTask2))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andReturn();
+
+        MvcResult mvcResult3 = mvc.perform(post("/dimensionContent/" + projetoDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentFormProjeto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andReturn();
+
+        MvcResult mvcResult4 = mvc.perform(post("/dimensionContent/" + tipoProjetoDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentFormTipoProjeto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andReturn();
+
+        MvcResult mvcResult5 = mvc.perform(get("/dimensionContent/" + taskDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(25)
+    @DisplayName("relaciona item task Criar Arvores Dimensoes com projeto Trilha Back Jr")
+    @SneakyThrows
+    public void relacionaItemTaskCriarArvoresDimensoesComProjetoTrilhaBackJr() {
+        DimensionContentForm dimensionContentFormTask = DimensionContentForm.builder()
+                .id(String.valueOf(itemTaskID))
+                .nodeContent(NodeContent.builder()
+                        .dimensionId(Long.valueOf(projetoDimensionID))
+                        .dimensionContentId(String.valueOf(itemProjetoID))
+                        .build())
+                .build();
+
+        MvcResult mvcResult = mvc.perform(put("/dimensionContent/addRelationship/" + taskDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentFormTask))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+
+    @Test
+    @Order(100)
+    @DisplayName("the last of us")
+    public void the_last_of_us() {
+        System.out.println(container.getJdbcUrl());
+        System.out.println("breakpoint ");
     }
 }
 

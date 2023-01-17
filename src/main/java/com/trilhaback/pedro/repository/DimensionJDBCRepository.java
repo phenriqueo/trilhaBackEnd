@@ -15,12 +15,6 @@ import java.util.List;
 public class DimensionJDBCRepository implements DimensionRepository {
 
     private static final String CREATE_DIMESION = "INSERT INTO dimension(name, data_type, sonid) VALUES(?, ?, null)";
-    private static final String CREATE_DIMENSION_TABLE = """
-            CREATE TABLE DIM_{0,number,#} (
-            id {1} PRIMARY KEY NOT NULL,
-            name varchar(128)
-            )
-            """;
     private static final String UPDATE_DIMENSION = "UPDATE dimension SET name = ?, data_type = ?  WHERE id = ?";
     private static final String FIND_BY_ID = "SELECT id, name, data_type, sonid FROM dimension WHERE id = ?";
     private static final String FIND_BY_NAME = "SELECT id, name, data_type, sonid FROM dimension WHERE name = ?";
@@ -39,7 +33,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
     public Dimension insert(Dimension dimension) {
         try (PreparedStatement pstm = connection.prepareStatement(CREATE_DIMESION, Statement.RETURN_GENERATED_KEYS)) {
             pstm.setString(1, dimension.getName());
-            pstm.setString(2, dimension.getDatatype().toString());
+            pstm.setString(2, dimension.getDataType().toString());
             pstm.execute();
             ResultSet rs = pstm.getGeneratedKeys();
             rs.next();
@@ -55,7 +49,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
     public Dimension update(Dimension dimension) {
         try (PreparedStatement pstm = connection.prepareStatement(UPDATE_DIMENSION, Statement.RETURN_GENERATED_KEYS)) {
             pstm.setString(1, dimension.getName());
-            pstm.setString(2, dimension.getDatatype().toString());
+            pstm.setString(2, dimension.getDataType().toString());
             pstm.setLong(3, dimension.getId());
             pstm.execute();
             try (ResultSet rs = pstm.getGeneratedKeys()) {
@@ -63,7 +57,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
                     String name = rs.getString("name");
                     DataType dataType = DataType.valueOf(rs.getString("data_type"));
                     dimension.setName(name);
-                    dimension.setDatatype(dataType);
+                    dimension.setDataType(dataType);
                 }
             }
         } catch (SQLException e) {

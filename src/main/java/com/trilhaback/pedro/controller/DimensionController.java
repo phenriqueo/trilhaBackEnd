@@ -78,9 +78,9 @@ public class DimensionController {
         );
     }
 
-    @PutMapping(value = "/removeSonId/{id}")
-        public ResponseEntity<?> removeSonId(@PathVariable Long id){
-        dimensionService.removeSonId(id);
+    @PutMapping(value = "/removeSonId/")
+        public ResponseEntity<?> removeSonId(@RequestBody DimensionForm dimensionForm){
+        dimensionService.removeSonId(dimensionForm);
         return new ResponseEntity<>(
                     HttpStatus.OK
             );

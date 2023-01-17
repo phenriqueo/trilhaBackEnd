@@ -76,6 +76,7 @@ public class DimensionService {
     public void addDimensionSon(DimensionForm dimensionForm) {
         dimensionJDBCRepository.findById(dimensionForm.getId());
         dimensionJDBCRepository.addDimensionSon(dimensionFormMapper.map(dimensionForm));
+        dimensionDDLRepository.insertNullLine(dimensionFormMapper.map(dimensionForm));
         dimensionDDLRepository.alterDimensionContentTableSonId(dimensionJDBCRepository.findById(dimensionForm.getId()));
     }
 
@@ -84,9 +85,10 @@ public class DimensionService {
         return dimensionViewMapper.map(dimensionJDBCRepository.findTreeById(id));
     }
 
-    public void removeSonId(Long id) {
-        this.findById(id);
-        dimensionJDBCRepository.removeSonId(id);
+    public void removeSonId(DimensionForm dimensionForm) {
+        this.findById(dimensionForm.getId());
+        dimensionJDBCRepository.removeSonId(dimensionForm.getId());
+        dimensionDDLRepository.dropParentDimensionColumn(dimensionFormMapper.map(dimensionForm));
     }
 }
 
