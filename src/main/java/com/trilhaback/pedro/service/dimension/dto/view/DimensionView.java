@@ -1,9 +1,8 @@
-package com.trilhaback.pedro.service.dto.view;
+package com.trilhaback.pedro.service.dimension.dto.view;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.trilhaback.pedro.domain.DataType;
-import com.trilhaback.pedro.domain.Dimension;
+import com.trilhaback.pedro.domain.dimension.DataType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

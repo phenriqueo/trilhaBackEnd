@@ -1,11 +1,10 @@
 package com.trilhaback.pedro;
 
 import com.jayway.jsonpath.JsonPath;
-import com.trilhaback.pedro.domain.DataType;
-import com.trilhaback.pedro.domain.Dimension;
-import com.trilhaback.pedro.domain.NodeContent;
-import com.trilhaback.pedro.service.dto.form.DimensionContentForm;
-import com.trilhaback.pedro.service.dto.form.DimensionForm;
+import com.trilhaback.pedro.domain.dimension.DataType;
+import com.trilhaback.pedro.domain.dimension.DimensionContent;
+import com.trilhaback.pedro.service.dimension.dto.form.DimensionContentForm;
+import com.trilhaback.pedro.service.dimension.dto.form.DimensionForm;
 import com.zaxxer.hikari.HikariConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
@@ -23,8 +22,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.print.attribute.standard.Media;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -513,9 +510,17 @@ public class DimensionControllerTest {
     public void relacionaItemTaskCriarArvoresDimensoesComProjetoTrilhaBackJr() {
         DimensionContentForm dimensionContentFormTask = DimensionContentForm.builder()
                 .id(String.valueOf(itemTaskID))
-                .nodeContent(NodeContent.builder()
+                .parentContent(DimensionContent.builder()
                         .dimensionId(Long.valueOf(projetoDimensionID))
-                        .dimensionContentId(String.valueOf(itemProjetoID))
+                        .id(String.valueOf(itemProjetoID))
+                        .build())
+                .build();
+
+        DimensionContentForm dimensionContentFormProjeto = DimensionContentForm.builder()
+                .id(String.valueOf(itemProjetoID))
+                .parentContent(DimensionContent.builder()
+                        .dimensionId(Long.valueOf(tipoProjetoDimensionID))
+                        .id(String.valueOf(itemTipoProjetoID))
                         .build())
                 .build();
 
@@ -526,8 +531,40 @@ public class DimensionControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
+
+        MvcResult mvcResult2 = mvc.perform(put("/dimensionContent/addRelationship/" + projetoDimensionID)
+                        .content(objectMapper.writeValueAsString(dimensionContentFormProjeto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
     }
 
+    @Test
+    @Order(26)
+    @DisplayName("busca por tabela de conteudo da dimensao task")
+    @SneakyThrows
+    public void buscaPorTabelaDeConteudoDaDimensaoTask() {
+        MvcResult mvcResult = mvc.perform(get("/dimension/dimensionTable/" + taskDimensionID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @Order(99)
+    @DisplayName("teste string sql")
+    @SneakyThrows
+    public void testeStringSql()  {
+        MvcResult mvcResult = mvc.perform(get("/dimension/test")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andReturn();
+    }
 
     @Test
     @Order(100)

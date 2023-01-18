@@ -1,13 +1,14 @@
-package com.trilhaback.pedro.service.mapper;
+package com.trilhaback.pedro.service.mapper.dimension;
 
-import com.trilhaback.pedro.domain.Dimension;
-import com.trilhaback.pedro.service.dto.view.DimensionView;
+import com.trilhaback.pedro.domain.dimension.Dimension;
+import com.trilhaback.pedro.service.dimension.dto.view.DimensionView;
+import com.trilhaback.pedro.service.mapper.Mapper;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
 @Component
-public class DimensionViewMapper implements Mapper<Dimension, DimensionView >{
+public class DimensionViewMapper implements Mapper<Dimension, DimensionView > {
 
     @Override
     public DimensionView map(Dimension dimension) {

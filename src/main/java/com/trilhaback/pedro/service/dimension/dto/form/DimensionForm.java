@@ -1,6 +1,6 @@
-package com.trilhaback.pedro.service.dto.form;
+package com.trilhaback.pedro.service.dimension.dto.form;
 
-import com.trilhaback.pedro.domain.DataType;
+import com.trilhaback.pedro.domain.dimension.DataType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

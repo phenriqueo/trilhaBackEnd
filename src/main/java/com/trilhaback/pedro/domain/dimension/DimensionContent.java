@@ -1,10 +1,6 @@
-package com.trilhaback.pedro.domain;
+package com.trilhaback.pedro.domain.dimension;
 
 import lombok.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +13,6 @@ public class DimensionContent {
     private String id;
     private String name;
     private Long dimensionId;
-    private List<NodeContent> nodeContentList;
+    private DimensionContent parentContent;
 
 }

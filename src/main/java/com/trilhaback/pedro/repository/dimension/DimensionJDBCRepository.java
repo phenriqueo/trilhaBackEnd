@@ -1,8 +1,9 @@
-package com.trilhaback.pedro.repository;
+package com.trilhaback.pedro.repository.dimension;
 
-import com.trilhaback.pedro.domain.DataType;
-import com.trilhaback.pedro.domain.Dimension;
-import com.trilhaback.pedro.domain.DimensionRepository;
+import com.trilhaback.pedro.domain.dimension.DataType;
+import com.trilhaback.pedro.domain.dimension.Dimension;
+import com.trilhaback.pedro.domain.dimension.DimensionRepository;
+import com.trilhaback.pedro.domain.dimension.TreeContent;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -74,12 +75,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
             pstm.execute();
             try (ResultSet rs = pstm.getResultSet()) {
                 while (rs.next()) {
-                    dimension = dimension.builder()
-                            .id(rs.getLong("id"))
-                            .name(rs.getString("name"))
-                            .dataType(DataType.valueOf(rs.getString("data_type")))
-                            .sonId(rs.getLong("sonid"))
-                            .build();
+                    dimension = dimension.builder().id(rs.getLong("id")).name(rs.getString("name")).dataType(DataType.valueOf(rs.getString("data_type"))).sonId(rs.getLong("sonid")).build();
                 }
             }
         } catch (SQLException e) {
@@ -109,12 +105,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
             pstm.execute();
             try (ResultSet rs = pstm.getResultSet()) {
                 while (rs.next()) {
-                    dimension = dimension.builder()
-                            .id(rs.getLong("id"))
-                            .name(rs.getString("name"))
-                            .dataType(DataType.valueOf(rs.getString("data_type")))
-                            .sonId(rs.getLong("sonid"))
-                            .build();
+                    dimension = dimension.builder().id(rs.getLong("id")).name(rs.getString("name")).dataType(DataType.valueOf(rs.getString("data_type"))).sonId(rs.getLong("sonid")).build();
                 }
             }
         } catch (SQLException e) {
@@ -130,12 +121,7 @@ public class DimensionJDBCRepository implements DimensionRepository {
             pstm.execute();
             try (ResultSet rs = pstm.getResultSet()) {
                 while (rs.next()) {
-                    dimensionList.add(Dimension.builder()
-                            .id(rs.getLong("id"))
-                            .name(rs.getString("name"))
-                            .dataType(DataType.valueOf(rs.getString("data_type")))
-                            .sonId(rs.getLong("sonid"))
-                            .build());
+                    dimensionList.add(Dimension.builder().id(rs.getLong("id")).name(rs.getString("name")).dataType(DataType.valueOf(rs.getString("data_type"))).sonId(rs.getLong("sonid")).build());
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -182,5 +168,32 @@ public class DimensionJDBCRepository implements DimensionRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public TreeContent getDimensionContentTable(String queryForDimensionContentTable) {
+        List<List<String>> dimensionContentResponseList = new ArrayList<>();
+        List<String> treeContentHeaders = new ArrayList<>();
+        TreeContent treeContent = new TreeContent();
+        try (PreparedStatement pstm = connection.prepareStatement(queryForDimensionContentTable)) {
+            pstm.execute();
+            try (ResultSet rs = pstm.getResultSet()) {
+                ResultSetMetaData rsm = rs.getMetaData();
+                for (int i = 1; i<= rsm.getColumnCount(); i += 2) {
+                    treeContentHeaders.add(rsm.getColumnName(i).toUpperCase());
+                }
+                while (rs.next()) {
+                    List<String> dimensionContentList = new ArrayList<>();
+                    for (int i = 1; i <= rsm.getColumnCount(); i += 2) {
+                        dimensionContentList.add(rs.getString(i) + " - " + rs.getString(i + 1));
+                    }
+                    dimensionContentResponseList.add(dimensionContentList);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        treeContent.setLines(dimensionContentResponseList);
+        treeContent.setNestedHeaders(treeContentHeaders);
+        return treeContent;
     }
 }

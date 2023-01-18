@@ -1,4 +1,4 @@
-package com.trilhaback.pedro.service.dto.view;
+package com.trilhaback.pedro.service.dimension.dto.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

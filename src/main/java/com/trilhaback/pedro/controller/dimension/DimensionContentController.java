@@ -1,9 +1,8 @@
-package com.trilhaback.pedro.controller;
+package com.trilhaback.pedro.controller.dimension;
 
-import com.trilhaback.pedro.domain.DimensionContent;
-import com.trilhaback.pedro.service.DimensionContentService;
-import com.trilhaback.pedro.service.dto.form.DimensionContentForm;
-import com.trilhaback.pedro.service.dto.view.DimensionContentView;
+import com.trilhaback.pedro.service.dimension.service.DimensionContentService;
+import com.trilhaback.pedro.service.dimension.dto.form.DimensionContentForm;
+import com.trilhaback.pedro.service.dimension.dto.view.DimensionContentView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

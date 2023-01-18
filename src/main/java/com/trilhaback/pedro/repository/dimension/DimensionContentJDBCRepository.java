@@ -1,6 +1,9 @@
-package com.trilhaback.pedro.repository;
+package com.trilhaback.pedro.repository.dimension;
 
-import com.trilhaback.pedro.domain.*;
+import com.trilhaback.pedro.domain.dimension.DataType;
+import com.trilhaback.pedro.domain.dimension.Dimension;
+import com.trilhaback.pedro.domain.dimension.DimensionContent;
+import com.trilhaback.pedro.domain.dimension.DimensionContentRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -11,7 +14,6 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequestScope
@@ -114,8 +116,8 @@ public class DimensionContentJDBCRepository implements DimensionContentRepositor
         String addDimensionRelationship = MessageFormat
                 .format(ADD_DIMENSION_RELATIONSHIP,
                         dimensionId,
-                        dimensionContent.getNodeContentList().get(0).getDimensionId(),
-                        dimensionContent.getNodeContentList().get(0).getDimensionContentId(),
+                        dimensionContent.getParentContent().getDimensionId(),
+                        dimensionContent.getParentContent().getId(),
                         dimensionContent.getId());
         try (PreparedStatement pstm = connection.prepareStatement(addDimensionRelationship)) {
             pstm.execute();
@@ -123,4 +125,7 @@ public class DimensionContentJDBCRepository implements DimensionContentRepositor
             throw new RuntimeException(e);
         }
     }
+
+
+
 }

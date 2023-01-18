@@ -1,4 +1,4 @@
-package com.trilhaback.pedro.domain;
+package com.trilhaback.pedro.domain.dimension;
 
 import java.util.List;
 

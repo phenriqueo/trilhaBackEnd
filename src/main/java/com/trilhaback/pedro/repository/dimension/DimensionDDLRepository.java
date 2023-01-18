@@ -1,6 +1,6 @@
-package com.trilhaback.pedro.repository;
+package com.trilhaback.pedro.repository.dimension;
 
-import com.trilhaback.pedro.domain.Dimension;
+import com.trilhaback.pedro.domain.dimension.Dimension;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -23,7 +23,7 @@ public class DimensionDDLRepository {
 
     private static final String ALTER_DIMENSION_TABLE_ADD_SONID = """
             ALTER TABLE DIM_{0,number,#}
-            ADD COLUMN ID_{1,number,#} {2} DEFAULT -999,
+            ADD COLUMN ID_{1,number,#} {2} /*DEFAULT -999*/,
             ADD CONSTRAINT ID_{1,number,#}
             FOREIGN KEY (ID_{1,number,#}) REFERENCES DIM_{1,number,#}(id)
             """;
@@ -71,14 +71,14 @@ public class DimensionDDLRepository {
         }
     }
 
-    public void insertNullLine(Dimension dimension) {
-        String insertNullLine = MessageFormat.format(INSERT_NULL_LINE, dimension.getId());
-        try (PreparedStatement pstm = connection.prepareStatement(insertNullLine)) {
-            pstm.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public void insertNullLine(Dimension dimension) {
+//        String insertNullLine = MessageFormat.format(INSERT_NULL_LINE, dimension.getId());
+//        try (PreparedStatement pstm = connection.prepareStatement(insertNullLine)) {
+//            pstm.execute();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public void dropParentDimensionColumn(Dimension dimension) {
         String alterDimensionTableRemoveSonId = MessageFormat.

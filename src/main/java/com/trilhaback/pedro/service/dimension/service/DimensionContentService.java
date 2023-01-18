@@ -1,13 +1,13 @@
-package com.trilhaback.pedro.service;
+package com.trilhaback.pedro.service.dimension.service;
 
-import com.trilhaback.pedro.domain.Dimension;
-import com.trilhaback.pedro.domain.DimensionContent;
-import com.trilhaback.pedro.repository.DimensionContentJDBCRepository;
-import com.trilhaback.pedro.repository.DimensionJDBCRepository;
-import com.trilhaback.pedro.service.dto.form.DimensionContentForm;
-import com.trilhaback.pedro.service.dto.view.DimensionContentView;
-import com.trilhaback.pedro.service.mapper.DimensionContentFormMapper;
-import com.trilhaback.pedro.service.mapper.DimensionContentViewMapper;
+import com.trilhaback.pedro.domain.dimension.Dimension;
+import com.trilhaback.pedro.domain.dimension.DimensionContent;
+import com.trilhaback.pedro.repository.dimension.DimensionContentJDBCRepository;
+import com.trilhaback.pedro.repository.dimension.DimensionJDBCRepository;
+import com.trilhaback.pedro.service.dimension.dto.form.DimensionContentForm;
+import com.trilhaback.pedro.service.dimension.dto.view.DimensionContentView;
+import com.trilhaback.pedro.service.mapper.dimension.DimensionContentFormMapper;
+import com.trilhaback.pedro.service.mapper.dimension.DimensionContentViewMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
